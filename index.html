@@ -122,7 +122,30 @@
       renderFusion();
     });
 
-    init();
+    init(    async function init() {
+      try {
+        const credRes = await fetch('credits.json');
+        if (credRes.ok) creditsMap = await credRes.json();
+      } catch (e) {}
+
+      const cached = localStorage.getItem('pokeList1025');
+      if (cached) {
+        pokemonList = JSON.parse(cached);
+      } else {
+        const res = await fetch('https://pokeapi.co');
+        const data = await res.json();
+        pokemonList = data.results.map((p, i) => ({ id: i + 1, name: cap(p.name) }));
+        localStorage.setItem('pokeList1025', JSON.stringify(pokemonList));
+      }
+
+      const options = pokemonList.map(p => `<option value="${p.id}">#${p.id} ${p.name}</option>`).join('');
+      headSelect.innerHTML = options;
+      bodySelect.innerHTML = options;
+      headSelect.value = 25;
+      bodySelect.value = 6;
+      renderFusion();
+    }
+);
   </script>
 </body>
 </html>
