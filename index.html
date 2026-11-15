@@ -6,16 +6,20 @@
   <title>Full Pokédex Fusion Gallery</title>
   <style>
     * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
-    body { background: #0f172a; color: #f8fafc; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-    h1 { margin-bottom: 5px; text-align: center; }
-    p.sub { color: #94a3b8; margin-top: 0; margin-bottom: 24px; text-align: center; }
-    .controls { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-bottom: 24px; max-width: 700px; width: 100%; }
-    .picker { background: #1e293b; padding: 14px; border-radius: 12px; flex: 1; min-width: 240px; border: 1px solid #334155; }
+    body { background: #0f172a; color: #f8fafc; margin: 0; padding: 24px 16px; display: flex; flex-direction: column; align-items: center; }
+    h1 { margin-bottom: 6px; text-align: center; }
+    p.sub { color: #94a3b8; margin-top: 0; margin-bottom: 16px; text-align: center; }
+    .discord-btn { display: inline-block; background: #5865F2; color: #fff; text-decoration: none; padding: 10px 20px; border-radius: 999px; font-weight: 700; font-size: 0.9rem; margin-bottom: 28px; }
+    .discord-btn:hover { background: #4752c4; }
+    .controls { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; margin-bottom: 18px; max-width: 720px; width: 100%; }
+    .picker { background: #1e293b; padding: 14px; border-radius: 12px; flex: 1; min-width: 250px; border: 1px solid #334155; }
     label { display: block; font-size: 0.85rem; color: #94a3b8; margin-bottom: 6px; font-weight: 600; }
-    select, button { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #475569; background: #0f172a; color: #fff; font-size: 1rem; }
+    input, select, button { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #475569; background: #0f172a; color: #fff; font-size: 0.95rem; }
+    input { margin-bottom: 8px; }
+    input:focus, select:focus { outline: none; border-color: #3b82f6; }
     button { background: #3b82f6; border: none; font-weight: 600; cursor: pointer; max-width: 220px; margin-bottom: 24px; }
     button:hover { background: #2563eb; }
-    .card { background: #1e293b; border: 1px solid #334155; border-radius: 16px; padding: 24px; text-align: center; max-width: 420px; width: 100%; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+    .card { background: #1e293b; border: 1px solid #334155; border-radius: 16px; padding: 24px; text-align: center; max-width: 420px; width: 100%; box-shadow: 0 10px 25px rgba(0,0,0,0.3); margin-bottom: 40px; }
     .stage { position: relative; width: 192px; height: 192px; margin: 0 auto 16px; background: #0f172a; border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
     .stage img { width: 160px; height: 160px; image-rendering: pixelated; object-fit: contain; }
     .auto-body { position: absolute; width: 150px; height: 150px; top: 28px; }
@@ -24,20 +28,31 @@
     .badge.custom { background: #10b98133; color: #34d399; border: 1px solid #10b981; }
     .badge.auto { background: #f59e0b33; color: #fbbf24; border: 1px solid #f59e0b; }
     .file-hint { font-size: 0.8rem; color: #64748b; margin-top: 12px; }
+    .showcase { max-width: 900px; width: 100%; border-top: 1px solid #1e293b; padding-top: 28px; text-align: center; }
+    .showcase h2 { margin-top: 0; margin-bottom: 6px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 14px; margin-top: 20px; }
+    .grid-item { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 12px; cursor: pointer; }
+    .grid-item:hover { border-color: #3b82f6; }
+    .grid-item img { width: 96px; height: 96px; image-rendering: pixelated; object-fit: contain; background: #0f172a; border-radius: 8px; padding: 4px; }
+    .grid-title { font-size: 0.85rem; font-weight: 700; margin-top: 8px; }
+    .grid-artist { font-size: 0.75rem; color: #94a3b8; margin-top: 2px; }
   </style>
 </head>
 <body>
 
   <h1>Full Pokédex Fusion Gallery</h1>
   <p class="sub">All 1,025 Pokémon • Community Sprite Archive</p>
+  <a class="discord-btn" href="https://discord.com" target="_blank" rel="noopener">Join Discord to Submit Sprites</a>
 
   <div class="controls">
     <div class="picker">
-      <label for="headSelect">Head Pokémon</label>
+      <label for="headSearch">Head Pokémon</label>
+      <input type="text" id="headSearch" placeholder="Search name or #..." />
       <select id="headSelect"><option>Loading...</option></select>
     </div>
     <div class="picker">
-      <label for="bodySelect">Body Pokémon</label>
+      <label for="bodySearch">Body Pokémon</label>
+      <input type="text" id="bodySearch" placeholder="Search name or #..." />
       <select id="bodySelect"><option>Loading...</option></select>
     </div>
   </div>
@@ -52,7 +67,15 @@
     <div class="file-hint" id="fileHint">Custom sprite filename: 25.6.png</div>
   </div>
 
+  <div class="showcase">
+    <h2>Community Art Showcase</h2>
+    <p class="sub" id="galleryCount">Custom sprites submitted by our community</p>
+    <div class="grid" id="galleryGrid"></div>
+  </div>
+
   <script>
+    const headSearch = document.getElementById('headSearch');
+    const bodySearch = document.getElementById('bodySearch');
     const headSelect = document.getElementById('headSelect');
     const bodySelect = document.getElementById('bodySelect');
     const stage = document.getElementById('spriteStage');
@@ -60,18 +83,19 @@
     const badge = document.getElementById('statusBadge');
     const credit = document.getElementById('artistCredit');
     const fileHint = document.getElementById('fileHint');
+    const galleryGrid = document.getElementById('galleryGrid');
+    const galleryCount = document.getElementById('galleryCount');
     const pokemonMap = new Map();
     let creditsMap = {};
 
-       const spriteUrl = (id) => 'https://cdn.jsdelivr.net/gh/PokeAPI/sprites@master/sprites/pokemon/' + id + '.png';
-
-
+    const spriteUrl = (id) => 'https://cdn.jsdelivr.net/gh/PokeAPI/sprites@master/sprites/pokemon/' + id + '.png';
 
     async function init() {
       for (let i = 1; i <= 1025; i++) {
-        pokemonMap.set(i, `Pokémon #${i}`);
+        pokemonMap.set(i, 'Pokémon #' + i);
       }
-      populateDropdowns();
+      populateDropdown(headSelect, '', 25);
+      populateDropdown(bodySelect, '', 6);
 
       try {
         const credRes = await fetch('credits.json');
@@ -79,29 +103,34 @@
       } catch (e) {}
 
       try {
-        const res = await fetch('https://cdn.jsdelivr.net/npm/pokemon@3.0.0/data/en.json');
+       const res = await fetch('https://cdn.jsdelivr.net/npm/pokemon@3.0.0/data/en.json');
         if (res.ok) {
           const names = await res.json();
           names.forEach((name, index) => {
             if (index < 1025) pokemonMap.set(index + 1, name);
           });
-          populateDropdowns();
+          populateDropdown(headSelect, headSearch.value, Number(headSelect.value) || 25);
+          populateDropdown(bodySelect, bodySearch.value, Number(bodySelect.value) || 6);
         }
       } catch (e) {}
+
+      renderFusion();
+      renderShowcase();
     }
 
-    function populateDropdowns() {
-      const prevHead = Number(headSelect.value) || 25;
-      const prevBody = Number(bodySelect.value) || 6;
+    function populateDropdown(selectEl, filterText, selectedId) {
+      const query = filterText.trim().toLowerCase();
       let options = '';
       pokemonMap.forEach((name, id) => {
-        options += `<option value="${id}">#${id} ${name}</option>`;
+        const label = '#' + id + ' ' + name;
+        if (!query || label.toLowerCase().includes(query)) {
+          options += '<option value="' + id + '">' + label + '</option>';
+        }
       });
-      headSelect.innerHTML = options;
-      bodySelect.innerHTML = options;
-      headSelect.value = prevHead;
-      bodySelect.value = prevBody;
-      renderFusion();
+      selectEl.innerHTML = options || '<option value="' + selectedId + '">No match found</option>';
+      Array.from(selectEl.options).forEach(opt => {
+        if (Number(opt.value) === selectedId) selectEl.value = selectedId;
+      });
     }
 
     function renderFusion() {
@@ -109,24 +138,23 @@
       const bId = Number(bodySelect.value) || 6;
       const hName = pokemonMap.get(hId);
       const bName = pokemonMap.get(bId);
-      const customPath = `sprites/${hId}.${bId}.png`;
+      const customPath = 'sprites/' + hId + '.' + bId + '.png';
 
-      title.textContent = `${hName} + ${bName}`;
-      fileHint.textContent = `Custom sprite filename: ${hId}.${bId}.png`;
+      title.textContent = hName + ' + ' + bName;
+      fileHint.textContent = 'Custom sprite filename: ' + hId + '.' + bId + '.png';
 
       const testImg = new Image();
       testImg.onload = () => {
-        stage.innerHTML = `<img src="${customPath}" alt="${hName} ${bName} fusion" />`;
+        stage.innerHTML = '<img src="' + customPath + '" alt="' + hName + ' ' + bName + ' fusion" />';
         badge.textContent = 'Custom Community Sprite';
         badge.className = 'badge custom';
-        const artist = creditsMap[`${hId}.${bId}`] || 'Community Artist';
-        credit.textContent = `Artist: ${artist}`;
+        const artist = creditsMap[hId + '.' + bId] || 'Community Artist';
+        credit.textContent = 'Artist: ' + artist;
       };
       testImg.onerror = () => {
-        stage.innerHTML = `
-          <img class="auto-body" src="${spriteUrl(bId)}" alt="${bName}" />
-          <img class="auto-head" src="${spriteUrl(hId)}" alt="${hName}" />
-        `;
+        stage.innerHTML =
+          '<img class="auto-body" src="' + spriteUrl(bId) + '" alt="' + bName + '" />' +
+          '<img class="auto-head" src="' + spriteUrl(hId) + '" alt="' + hName + '" />';
         badge.textContent = 'Auto-Preview (Needs Custom Art)';
         badge.className = 'badge auto';
         credit.textContent = 'Artist: None yet — submit yours on Discord!';
@@ -134,11 +162,50 @@
       testImg.src = customPath;
     }
 
+    function renderShowcase() {
+      const keys = Object.keys(creditsMap);
+      if (keys.length === 0) {
+        galleryCount.textContent = 'No custom sprites uploaded yet — be the first on Discord!';
+        return;
+      }
+      galleryCount.textContent = keys.length + ' custom fusion(s) archived so far (click any to view)';
+      galleryGrid.innerHTML = keys.map(key => {
+        const parts = key.split('.');
+        const hId = Number(parts.at(0));
+        const bId = Number(parts.at(1));
+        const label = (pokemonMap.get(hId) || '#' + hId) + ' + ' + (pokemonMap.get(bId) || '#' + bId);
+        return '<div class="grid-item" onclick="selectFusion(' + hId + ',' + bId + ')">' +
+          '<img src="sprites/' + key + '.png" alt="' + label + '" />' +
+          '<div class="grid-title">' + label + '</div>' +
+          '<div class="grid-artist">by ' + creditsMap[key] + '</div>' +
+        '</div>';
+      }).join('');
+    }
+
+    window.selectFusion = (hId, bId) => {
+      headSearch.value = '';
+      bodySearch.value = '';
+      populateDropdown(headSelect, '', hId);
+      populateDropdown(bodySelect, '', bId);
+      renderFusion();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    headSearch.addEventListener('input', () => {
+      populateDropdown(headSelect, headSearch.value, Number(headSelect.value));
+      renderFusion();
+    });
+        bodySearch.addEventListener('input', () => {
+      populateDropdown(bodySelect, bodySearch.value, Number(bodySelect.value));
+      renderFusion();
+    });
     headSelect.addEventListener('change', renderFusion);
     bodySelect.addEventListener('change', renderFusion);
     document.getElementById('randomBtn').addEventListener('click', () => {
-      headSelect.value = Math.floor(Math.random() * 1025) + 1;
-      bodySelect.value = Math.floor(Math.random() * 1025) + 1;
+      headSearch.value = '';
+      bodySearch.value = '';
+      populateDropdown(headSelect, '', Math.floor(Math.random() * 1025) + 1);
+      populateDropdown(bodySelect, '', Math.floor(Math.random() * 1025) + 1);
       renderFusion();
     });
 
