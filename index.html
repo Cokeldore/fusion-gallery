@@ -18,8 +18,8 @@
     .card { background: #1e293b; border: 1px solid #334155; border-radius: 16px; padding: 24px; text-align: center; max-width: 420px; width: 100%; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
     .stage { position: relative; width: 192px; height: 192px; margin: 0 auto 16px; background: #0f172a; border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
     .stage img { width: 160px; height: 160px; image-rendering: pixelated; object-fit: contain; }
-    .auto-body { position: absolute; width: 150px; height: 150px; top: 28px; }
-    .auto-head { position: absolute; width: 95px; height: 95px; top: 10px; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.6)); }
+    .auto-body { position: absolute; width: 140px; height: 140px; top: 32px; }
+    .auto-head { position: absolute; width: 88px; height: 88px; top: 12px; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.6)); }
     .badge { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; margin-bottom: 10px; }
     .badge.custom { background: #10b98133; color: #34d399; border: 1px solid #10b981; }
     .badge.auto { background: #f59e0b33; color: #fbbf24; border: 1px solid #f59e0b; }
@@ -63,8 +63,8 @@
     const pokemonMap = new Map();
     let creditsMap = {};
 
-    const spriteUrl = (id) => `https://githubusercontent.com{id}.png`;
-    const cap = (str) => str ? str.charAt(0).toUpperCase() + str.slice(1) : '';
+    const toSlug = (name) => name.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const spriteUrl = (name) => `https://pokemonshowdown.com{toSlug(name)}.png`;
 
     async function init() {
       for (let i = 1; i <= 1025; i++) {
@@ -78,11 +78,13 @@
       } catch (e) {}
 
       try {
-        const res = await fetch('https://pokeapi.co');
+        const res = await fetch('https://pokemonshowdown.com');
         if (res.ok) {
-          const data = await res.json();
-          data.results.forEach((item, index) => {
-            pokemonMap.set(index + 1, cap(item.name));
+          const dex = await res.json();
+          Object.values(dex).forEach(entry => {
+            if (entry.num >= 1 && entry.num <= 1025 && !entry.forme) {
+              pokemonMap.set(entry.num, entry.name);
+            }
           });
           populateDropdowns();
         }
@@ -123,8 +125,8 @@
       };
       testImg.onerror = () => {
         stage.innerHTML = `
-          <img class="auto-body" src="${spriteUrl(bId)}" alt="${bName}" />
-          <img class="auto-head" src="${spriteUrl(hId)}" alt="${hName}" />
+          <img class="auto-body" src="${spriteUrl(bName)}" alt="${bName}" referrerpolicy="no-referrer" />
+          <img class="auto-head" src="${spriteUrl(hName)}" alt="${hName}" referrerpolicy="no-referrer" />
         `;
         badge.textContent = 'Auto-Preview (Needs Custom Art)';
         badge.className = 'badge auto';
