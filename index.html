@@ -63,8 +63,7 @@
     const pokemonMap = new Map();
     let creditsMap = {};
 
-    const pad3 = (id) => String(id).padStart(3, '0');
-    const spriteUrl = (id) => `https://serebii.net{pad3(id)}.png`;
+    const spriteUrl = (id) => `https://githubusercontent.com{id}.png`;
     const cap = (str) => str ? str.charAt(0).toUpperCase() + str.slice(1) : '';
 
     async function init() {
