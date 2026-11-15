@@ -109,7 +109,7 @@
     const el = (id) => document.getElementById(id);
     const pokemonMap = new Map();
     let creditsMap = {}, selectedDexId = 25;
-    const spriteUrl = (id) => 'https://jsdelivr.net' + id + '.png';
+    const spriteUrl = (id) => 'https://cdn.jsdelivr.net/gh/PokeAPI/sprites@master/sprites/pokemon/' + id + '.png';
 
     document.querySelectorAll('.nav-btn').forEach(btn => btn.addEventListener('click', () => {
       document.querySelectorAll('.nav-btn, .view').forEach(x => x.classList.remove('active'));
@@ -121,7 +121,7 @@
       fillSelect(el('headSelect'), '', 25); fillSelect(el('bodySelect'), '', 6); renderDexList('');
       try { const r = await fetch('credits.json'); if (r.ok) creditsMap = await r.json(); } catch (e) {}
       try {
-        const r = await fetch('https://jsdelivr.net');
+        const r = await fetch('https://cdn.jsdelivr.net/npm/pokemon@3.0.0/data/en.json');
         if (r.ok) { (await r.json()).forEach((n, i) => { if (i < 1025) pokemonMap.set(i + 1, n); }); }
       } catch (e) {}
       fillSelect(el('headSelect'), el('headSearch').value, Number(el('headSelect').value) || 25);
