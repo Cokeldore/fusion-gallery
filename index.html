@@ -63,23 +63,20 @@
     let pokemonList = [];
     let creditsMap = {};
 
-    const spriteUrl = (id) => `https://githubusercontent.com{id}.png`;
+    const spriteUrl = (id) => `https://jsdelivr.net{id}.png`;
     const cap = (str) => str.charAt(0).toUpperCase() + str.slice(1);
 
     async function init() {
-      // Immediately populate 1-1025 numbers so dropdowns never freeze
       pokemonList = Array.from({ length: 1025 }, (_, i) => ({ id: i + 1, name: `Pokémon #${i + 1}` }));
       populateDropdowns();
 
-      // Load credits safely
       try {
         const credRes = await fetch('credits.json');
         if (credRes.ok) creditsMap = await credRes.json();
       } catch (e) {}
 
-      // Fetch real names from fast GitHub CSV mirror
       try {
-        const csvRes = await fetch('https://githubusercontent.com');
+        const csvRes = await fetch('https://jsdelivr.net');
         if (csvRes.ok) {
           const text = await csvRes.text();
           const lines = text.trim().split('\n').slice(1);
@@ -92,9 +89,7 @@
           });
           populateDropdowns();
         }
-      } catch (e) {
-        console.warn('Could not load species names, keeping Dex numbers.', e);
-      }
+      } catch (e) {}
     }
 
     function populateDropdowns() {
