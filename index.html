@@ -63,7 +63,9 @@
     const pokemonMap = new Map();
     let creditsMap = {};
 
-    const spriteUrl = (id) => `https://jsdelivr.net{id}.png`;
+       const spriteUrl = (id) => 'https://cdn.jsdelivr.net/gh/PokeAPI/sprites@master/sprites/pokemon/' + id + '.png';
+
+
 
     async function init() {
       for (let i = 1; i <= 1025; i++) {
