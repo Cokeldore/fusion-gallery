@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AllPokéFusions — 1,025 Pokédex Fusion Gallery</title>
+  <style>
+    * { box-sizing: border-box; font-family: system-ui, sans-serif; }
+    body { background: #0f172a; color: #f8fafc; margin: 0; display: flex; min-height: 100vh; }
+    .sidebar { width: 230px; background: #1e293b; border-right: 1px solid #334155; padding: 18px 12px; display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
+    .brand { font-size: 1.15rem; font-weight: 800; padding: 4px 10px 14px; border-bottom: 1px solid #334155; margin-bottom: 6px; }
+    .brand span { color: #3b82f6; }
+    .nav-btn { background: transparent; border: none; color: #94a3b8; text-align: left; padding: 11px 12px; border-radius: 8px; font-size: 0.95rem; font-weight: 600; cursor: pointer; }
+    .nav-btn:hover { background: #0f172a; color: #fff; }
+    .nav-btn.active { background: #3b82f6; color: #fff; }
+    .nav-btn.discord-tab { margin-top: auto; background: #5865F222; color: #818cf8; border: 1px solid #5865F255; }
+    .nav-btn.discord-tab:hover, .nav-btn.discord-tab.active { background: #5865F2; color: #fff; }
+    .main { flex: 1; padding: 24px 18px; display: flex; flex-direction: column; align-items: center; }
+    .view { display: none; width: 100%; max-width: 920px; flex-direction: column; align-items: center; }
+    .view.active { display: flex; }
+    h1 { margin: 0 0 6px; text-align: center; }
+    p.sub { color: #94a3b8; margin: 0 0 22px; text-align: center; }
+    .controls { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-bottom: 16px; max-width: 700px; width: 100%; }
+    .picker { background: #1e293b; padding: 14px; border-radius: 12px; flex: 1; min-width: 240px; border: 1px solid #334155; }
+    label { display: block; font-size: 0.85rem; color: #94a3b8; margin-bottom: 6px; font-weight: 600; }
+    input, select { width: 100%; padding: 9px; border-radius: 8px; border: 1px solid #475569; background: #0f172a; color: #fff; font-size: 0.95rem; }
+    input { margin-bottom: 8px; }
+    .action-btn { background: #3b82f6; border: none; color: #fff; padding: 10px 22px; border-radius: 8px; font-size: 0.95rem; font-weight: 600; cursor: pointer; margin-bottom: 22px; }
+    .card { background: #1e293b; border: 1px solid #334155; border-radius: 16px; padding: 22px; text-align: center; max-width: 420px; width: 100%; }
+    .stage { position: relative; width: 192px; height: 192px; margin: 0 auto 14px; background: #0f172a; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+    .stage img { width: 160px; height: 160px; image-rendering: pixelated; object-fit: contain; }
+    .auto-body { position: absolute; width: 150px; height: 150px; top: 28px; }
+    .auto-head { position: absolute; width: 95px; height: 95px; top: 10px; }
+    .badge { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; margin-bottom: 10px; }
+    .badge.custom { background: #10b98133; color: #34d399; border: 1px solid #10b981; }
+    .badge.auto { background: #f59e0b33; color: #fbbf24; border: 1px solid #f59e0b; }
+    .dex-layout { display: flex; gap: 18px; width: 100%; align-items: flex-start; }
+    .dex-list-panel { width: 260px; background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 12px; flex-shrink: 0; }
+    .dex-scroll { max-height: 500px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; margin-top: 8px; }
+    .dex-item { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 8px; background: transparent; border: none; color: #e2e8f0; cursor: pointer; text-align: left; font-size: 0.9rem; }
+    .dex-item:hover { background: #0f172a; }
+    .dex-item.selected { background: #3b82f6; color: #fff; font-weight: 700; }
+    .dex-item img { width: 32px; height: 32px; image-rendering: pixelated; }
+    .dex-sprites-panel { flex: 1; background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 18px; min-height: 380px; }
+    .dex-header { display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #334155; padding-bottom: 12px; margin-bottom: 16px; }
+    .dex-header img { width: 56px; height: 56px; background: #0f172a; border-radius: 8px; image-rendering: pixelated; }
+    .sprite-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+    .sprite-card { background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 10px; text-align: center; cursor: pointer; }
+    .sprite-card:hover { border-color: #3b82f6; }
+    .sprite-card img { width: 96px; height: 96px; image-rendering: pixelated; object-fit: contain; }
+    .discord-box { background: #1e293b; border: 1px solid #334155; border-radius: 16px; padding: 24px; max-width: 580px; width: 100%; line-height: 1.6; }
+    .discord-cta { display: inline-block; background: #5865F2; color: #fff; text-decoration: none; padding: 11px 22px; border-radius: 8px; font-weight: 700; margin: 10px 0 18px; }
+    @media (max-width: 768px) { body { flex-direction: column; } .sidebar { width: 100%; flex-direction: row; overflow-x: auto; } .brand { display: none; } .dex-layout { flex-direction: column; } .dex-list-panel { width: 100%; } .dex-scroll { max-height: 200px; } }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand">AllPoké<span>Fusions</span></div>
+    <button class="nav-btn active" data-tab="homeView">⚡ Home Generator</button>
+    <button class="nav-btn" data-tab="galleryView">🖼️ Sprite Gallery</button>
+    <button class="nav-btn discord-tab" data-tab="discordView">💬 Discord & Rules</button>
+  </aside>
+  <main class="main">
+    <section id="homeView" class="view active">
+      <h1>Full Pokédex Fusion Gallery</h1>
+      <p class="sub">All 1,025 Pokémon • Community Sprite Archive</p>
+      <div class="controls">
+        <div class="picker"><label>Head Pokémon</label><input type="text" id="headSearch" placeholder="Search..." /><select id="headSelect"></select></div>
+        <div class="picker"><label>Body Pokémon</label><input type="text" id="bodySearch" placeholder="Search..." /><select id="bodySelect"></select></div>
+      </div>
+      <button class="action-btn" id="randomBtn">Randomize Fusion</button>
+      <div class="card">
+        <span id="statusBadge" class="badge auto">Auto-Preview (Needs Custom Art)</span>
+        <div class="stage" id="spriteStage"></div>
+        <h2 id="fusionTitle" style="margin:0 0 6px;">Pikachu + Charizard</h2>
+        <div id="artistCredit" style="color:#94a3b8;font-size:0.9rem;">Artist: None yet</div>
+        <div id="fileHint" style="font-size:0.8rem;color:#64748b;margin-top:10px;">Filename: 25.6.png</div>
+      </div>
+    </section>
+    <section id="galleryView" class="view">
+      <h1>Pokédex Sprite Gallery</h1>
+      <p class="sub">Select a Pokémon to browse all custom fusions assigned to it</p>
+      <div class="dex-layout">
+        <div class="dex-list-panel"><input type="text" id="dexSearch" placeholder="Filter 1,025 Pokémon..." /><div class="dex-scroll" id="dexList"></div></div>
+        <div class="dex-sprites-panel">
+          <div class="dex-header"><img id="dexHeaderImg" src="" alt="" /><div><h2 id="dexHeaderTitle" style="margin:0;">#25 Pikachu</h2><div id="dexHeaderCount" style="color:#94a3b8;font-size:0.9rem;">Loading...</div></div></div>
+          <div class="sprite-grid" id="dexSpriteGrid"></div>
+        </div>
+      </div>
+    </section>
+    <section id="discordView" class="view">
+      <h1>Join the Artist Community</h1>
+      <p class="sub">Submit custom sprites and help complete all 1,025 Pokémon</p>
+      <div class="discord-box">
+        <h2 style="margin-top:0;">Official Discord Server</h2>
+        <p style="color:#94a3b8;">All custom sprites on AllPokéFusions are drawn and submitted by community pixel artists on Discord.</p>
+        <a class="discord-cta" href="https://discord.com" target="_blank" rel="noopener">Join Our Discord Server</a>
+        <h3>Sprite Submission Rules</h3>
+        <ul>
+          <li><strong>Size:</strong> 288x288 pixels (or 96x96 scaled 3x) transparent PNG.</li>
+          <li><strong>Filename:</strong> Strictly <code>HeadID.BodyID.png</code> (e.g., <code>25.6.png</code>).</li>
+          <li><strong>Original Art Only:</strong> No stolen sprites from other fan games or AI-generated art.</li>
+          <li><strong>Credits:</strong> Include your artist name so you are credited on every fusion.</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+  <script>
+    const el = (id) => document.getElementById(id);
+    const pokemonMap = new Map();
+    let creditsMap = {}, selectedDexId = 25;
+    const spriteUrl = (id) => 'https://jsdelivr.net' + id + '.png';
+
+    document.querySelectorAll('.nav-btn').forEach(btn => btn.addEventListener('click', () => {
+      document.querySelectorAll('.nav-btn, .view').forEach(x => x.classList.remove('active'));
+      btn.classList.add('active'); el(btn.dataset.tab).classList.add('active');
+    }));
+
+    async function init() {
+      for (let i = 1; i <= 1025; i++) pokemonMap.set(i, 'Pokémon #' + i);
+      fillSelect(el('headSelect'), '', 25); fillSelect(el('bodySelect'), '', 6); renderDexList('');
+      try { const r = await fetch('credits.json'); if (r.ok) creditsMap = await r.json(); } catch (e) {}
+      try {
+        const r = await fetch('https://jsdelivr.net');
+        if (r.ok) { (await r.json()).forEach((n, i) => { if (i < 1025) pokemonMap.set(i + 1, n); }); }
+      } catch (e) {}
+      fillSelect(el('headSelect'), el('headSearch').value, Number(el('headSelect').value) || 25);
+      fillSelect(el('bodySelect'), el('bodySearch').value, Number(el('bodySelect').value) || 6);
+      renderDexList(el('dexSearch').value); renderFusion(); selectDexPokemon(25);
+    }
+
+    function fillSelect(sel, q, cur) {
+      q = q.trim().toLowerCase(); let html = '';
+      pokemonMap.forEach((n, id) => { const lbl = '#' + id + ' ' + n; if (!q || lbl.toLowerCase().includes(q)) html += '<option value="' + id + '">' + lbl + '</option>'; });
+      sel.innerHTML = html || '<option value="' + cur + '">No match</option>';
+      Array.from(sel.options).forEach(o => { if (Number(o.value) === cur) sel.value = cur; });
+    }
+
+    function renderFusion() {
+      const h = Number(el('headSelect').value) || 25, b = Number(el('bodySelect').value) || 6;
+      const hN = pokemonMap.get(h), bN = pokemonMap.get(b), path = 'sprites/' + h + '.' + b + '.png';
+      el('fusionTitle').textContent = hN + ' + ' + bN; el('fileHint').textContent = 'Custom sprite filename: ' + h + '.' + b + '.png';
+      const img = new Image();
+      img.onload = () => { el('spriteStage').innerHTML = '<img src="' + path + '" />'; el('statusBadge').textContent = 'Custom Community Sprite'; el('statusBadge').className = 'badge custom'; el('artistCredit').textContent = 'Artist: ' + (creditsMap[h + '.' + b] || 'Community Artist'); };
+      img.onerror = () => { el('spriteStage').innerHTML = '<img class="auto-body" src="' + spriteUrl(b) + '" /><img class="auto-head" src="' + spriteUrl(h) + '" />'; el('statusBadge').textContent = 'Auto-Preview (Needs Custom Art)'; el('statusBadge').className = 'badge auto'; el('artistCredit').textContent = 'Artist: None yet — submit yours on Discord!'; };
+      img.src = path;
+    }
+
+    function renderDexList(q) {
+      q = q.trim().toLowerCase(); let html = '';
+      pokemonMap.forEach((n, id) => {
+        const lbl = '#' + id + ' ' + n;
+        if (!q || lbl.toLowerCase().includes(q)) html += '<button class="dex-item' + (id === selectedDexId ? ' selected' : '') + '" onclick="selectDexPokemon(' + id + ')"><img src="' + spriteUrl(id) + '" loading="lazy" /><span>' + lbl + '</span></button>';
+      });
+      el('dexList').innerHTML = html;
+    }
+
+    window.selectDexPokemon = (id) => {
+      selectedDexId = id; const pN = pokemonMap.get(id);
+      el('dexHeaderImg').src = spriteUrl(id); el('dexHeaderTitle').textContent = '#' + id + ' ' + pN; renderDexList(el('dexSearch').value);
+      const matches = Object.keys(creditsMap).filter(k => { const p = k.split('.'); return Number(p.at(0)) === id || Number(p.at(1)) === id; });
+      el('dexHeaderCount').textContent = matches.length + ' custom fusion(s) featuring ' + pN;
+      el('dexSpriteGrid').innerHTML = matches.length ? matches.map(k => {
+        const p = k.split('.'), h = Number(p.at(0)), b = Number(p.at(1)), lbl = pokemonMap.get(h) + ' + ' + pokemonMap.get(b);
+        return '<div class="sprite-card" onclick="openGen(' + h + ',' + b + ')"><img src="sprites/' + k + '.png" /><div style="font-weight:700;font-size:0.85rem;margin-top:6px;">' + lbl + '</div><div style="font-size:0.75rem;color:#94a3b8;">' + (h === id ? 'Head' : 'Body') + ' • by ' + creditsMap[k] + '</div></div>';
+      }).join('') : '<div style="grid-column:1/-1;color:#94a3b8;padding:16px 0;">No custom sprites uploaded for ' + pN + ' yet.</div>';
+    };
+
+    window.openGen = (h, b) => { el('headSearch').value = ''; el('bodySearch').value = ''; fillSelect(el('headSelect'), '', h); fillSelect(el('bodySelect'), '', b); renderFusion(); document.querySelector('[data-tab="homeView"]').click(); };
+    el('dexSearch').addEventListener('input', () => renderDexList(el('dexSearch').value));
+    el('headSearch').addEventListener('input', () => { fillSelect(el('headSelect'), el('headSearch').value, Number(el('headSelect').value)); renderFusion(); });
+    el('bodySearch').addEventListener('input', () => { fillSelect(el('bodySelect'), el('bodySearch').value, Number(el('bodySelect').value)); renderFusion(); });
+    el('headSelect').addEventListener('change', renderFusion); el('bodySelect').addEventListener('change', renderFusion);
+    el('randomBtn').addEventListener('click', () => { el('headSearch').value = ''; el('bodySearch').value = ''; fillSelect(el('headSelect'), '', Math.floor(Math.random() * 1025) + 1); fillSelect(el('bodySelect'), '', Math.floor(Math.random() * 1025) + 1); renderFusion(); });
+    init();
+  </script>
+</body>
+</html>
