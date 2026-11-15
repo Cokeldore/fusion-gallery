@@ -195,3 +195,22 @@
       populateDropdown(headSelect, headSearch.value, Number(headSelect.value));
       renderFusion();
     });
+        bodySearch.addEventListener('input', () => {
+      populateDropdown(bodySelect, bodySearch.value, Number(bodySelect.value));
+      renderFusion();
+    });
+    headSelect.addEventListener('change', renderFusion);
+    bodySelect.addEventListener('change', renderFusion);
+    document.getElementById('randomBtn').addEventListener('click', () => {
+      headSearch.value = '';
+      bodySearch.value = '';
+      populateDropdown(headSelect, '', Math.floor(Math.random() * 1025) + 1);
+      populateDropdown(bodySelect, '', Math.floor(Math.random() * 1025) + 1);
+      renderFusion();
+    });
+
+    init();
+  </script>
+</body>
+</html>
+
