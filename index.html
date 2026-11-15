@@ -60,14 +60,17 @@
     const badge = document.getElementById('statusBadge');
     const credit = document.getElementById('artistCredit');
     const fileHint = document.getElementById('fileHint');
-    let pokemonList = [];
+    const pokemonMap = new Map();
     let creditsMap = {};
 
-    const spriteUrl = (id) => `https://githubusercontent.com{id}.png`;
+    const pad3 = (id) => String(id).padStart(3, '0');
+    const spriteUrl = (id) => `https://serebii.net{pad3(id)}.png`;
     const cap = (str) => str ? str.charAt(0).toUpperCase() + str.slice(1) : '';
 
     async function init() {
-      pokemonList = Array.from({ length: 1025 }, (_, i) => ({ id: i + 1, name: `Pokémon #${i + 1}` }));
+      for (let i = 1; i <= 1025; i++) {
+        pokemonMap.set(i, `Pokémon #${i}`);
+      }
       populateDropdowns();
 
       try {
@@ -76,16 +79,11 @@
       } catch (e) {}
 
       try {
-        const csvRes = await fetch('https://githubusercontent.com');
-        if (csvRes.ok) {
-          const text = await csvRes.text();
-          const lines = text.trim().split('\n').slice(1);
-          lines.forEach(line => {
-            const cols = line.split(',');
-            const id = parseInt(cols[0], 10);
-            if (id >= 1 && id <= 1025 && cols[1]) {
-              pokemonList[id - 1] = { id, name: cap(cols[1]) };
-            }
+        const res = await fetch('https://pokeapi.co');
+        if (res.ok) {
+          const data = await res.json();
+          data.results.forEach((item, index) => {
+            pokemonMap.set(index + 1, cap(item.name));
           });
           populateDropdowns();
         }
@@ -93,9 +91,12 @@
     }
 
     function populateDropdowns() {
-      const prevHead = headSelect.value && !isNaN(headSelect.value) ? headSelect.value : 25;
-      const prevBody = bodySelect.value && !isNaN(bodySelect.value) ? bodySelect.value : 6;
-      const options = pokemonList.map(p => `<option value="${p.id}">#${p.id} ${p.name}</option>`).join('');
+      const prevHead = Number(headSelect.value) || 25;
+      const prevBody = Number(bodySelect.value) || 6;
+      let options = '';
+      pokemonMap.forEach((name, id) => {
+        options += `<option value="${id}">#${id} ${name}</option>`;
+      });
       headSelect.innerHTML = options;
       bodySelect.innerHTML = options;
       headSelect.value = prevHead;
@@ -106,8 +107,8 @@
     function renderFusion() {
       const hId = Number(headSelect.value) || 25;
       const bId = Number(bodySelect.value) || 6;
-      const hName = pokemonList[hId - 1].name;
-      const bName = pokemonList[bId - 1].name;
+      const hName = pokemonMap.get(hId);
+      const bName = pokemonMap.get(bId);
       const customPath = `sprites/${hId}.${bId}.png`;
 
       title.textContent = `${hName} + ${bName}`;
