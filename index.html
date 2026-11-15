@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Full Pokédex Fusion Gallery</title>
+  <style>
+    * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
+    body { background: #0f172a; color: #f8fafc; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+    h1 { margin-bottom: 5px; text-align: center; }
+    p.sub { color: #94a3b8; margin-top: 0; margin-bottom: 24px; text-align: center; }
+    .controls { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-bottom: 24px; max-width: 700px; width: 100%; }
+    .picker { background: #1e293b; padding: 14px; border-radius: 12px; flex: 1; min-width: 240px; border: 1px solid #334155; }
+    label { display: block; font-size: 0.85rem; color: #94a3b8; margin-bottom: 6px; font-weight: 600; }
+    select, button { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #475569; background: #0f172a; color: #fff; font-size: 1rem; }
+    button { background: #3b82f6; border: none; font-weight: 600; cursor: pointer; max-width: 220px; margin-bottom: 24px; }
+    button:hover { background: #2563eb; }
+    .card { background: #1e293b; border: 1px solid #334155; border-radius: 16px; padding: 24px; text-align: center; max-width: 420px; width: 100%; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+    .stage { position: relative; width: 192px; height: 192px; margin: 0 auto 16px; background: #0f172a; border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .stage img { width: 160px; height: 160px; image-rendering: pixelated; object-fit: contain; }
+    .auto-body { position: absolute; width: 150px; height: 150px; top: 28px; }
+    .auto-head { position: absolute; width: 95px; height: 95px; top: 10px; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.6)); }
+    .badge { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; margin-bottom: 10px; }
+    .badge.custom { background: #10b98133; color: #34d399; border: 1px solid #10b981; }
+    .badge.auto { background: #f59e0b33; color: #fbbf24; border: 1px solid #f59e0b; }
+    .file-hint { font-size: 0.8rem; color: #64748b; margin-top: 12px; }
+  </style>
+</head>
+<body>
+
+  <h1>Full Pokédex Fusion Gallery</h1>
+  <p class="sub">All 1,025 Pokémon • Community Sprite Archive</p>
+
+  <div class="controls">
+    <div class="picker">
+      <label for="headSelect">Head Pokémon</label>
+      <select id="headSelect"><option>Loading 1,025 Pokémon...</option></select>
+    </div>
+    <div class="picker">
+      <label for="bodySelect">Body Pokémon</label>
+      <select id="bodySelect"><option>Loading 1,025 Pokémon...</option></select>
+    </div>
+  </div>
+
+  <button id="randomBtn">Randomize Fusion</button>
+
+  <div class="card">
+    <span id="statusBadge" class="badge auto">Auto-Preview (Needs Custom Art)</span>
+    <div class="stage" id="spriteStage"></div>
+    <h2 id="fusionTitle" style="margin: 0 0 6px;">Bulbasaur + Charmander</h2>
+    <div id="artistCredit" style="color: #94a3b8; font-size: 0.9rem;">Artist: None yet — submit yours on Discord!</div>
+    <div class="file-hint" id="fileHint">Expected file: sprites/1.4.png</div>
+  </div>
+
+  <script>
+    const headSelect = document.getElementById('headSelect');
+    const bodySelect = document.getElementById('bodySelect');
+    const stage = document.getElementById('spriteStage');
+    const title = document.getElementById('fusionTitle');
+    const badge = document.getElementById('statusBadge');
+    const credit = document.getElementById('artistCredit');
+    const fileHint = document.getElementById('fileHint');
+    let pokemonList = [];
+    let creditsMap = {};
+
+    const spriteUrl = (id) => `https://githubusercontent.com{id}.png`;
+    const cap = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+
+    async function init() {
+      try {
+        const credRes = await fetch('credits.json');
+        if (credRes.ok) creditsMap = await credRes.json();
+      } catch (e) {}
+
+      const res = await fetch('https://pokeapi.co');
+      const data = await res.json();
+      pokemonList = data.results.map((p, i) => ({ id: i + 1, name: cap(p.name) }));
+
+      const options = pokemonList.map(p => `<option value="${p.id}">#${p.id} ${p.name}</option>`).join('');
+      headSelect.innerHTML = options;
+      bodySelect.innerHTML = options;
+      headSelect.value = 25; // Pikachu
+      bodySelect.value = 6;  // Charizard
+      renderFusion();
+    }
+
+    function renderFusion() {
+      const hId = headSelect.value;
+      const bId = bodySelect.value;
+      const hName = pokemonList[hId - 1].name;
+      const bName = pokemonList[bId - 1].name;
+      const customPath = `sprites/${hId}.${bId}.png`;
+
+      title.textContent = `${hName} + ${bName}`;
+      fileHint.textContent = `Custom sprite filename: ${hId}.${bId}.png`;
+
+      const testImg = new Image();
+      testImg.onload = () => {
+        stage.innerHTML = `<img src="${customPath}" alt="${hName} ${bName} fusion" />`;
+        badge.textContent = 'Custom Community Sprite';
+        badge.className = 'badge custom';
+        const artist = creditsMap[`${hId}.${bId}`] || 'Community Artist';
+        credit.textContent = `Artist: ${artist}`;
+      };
+      testImg.onerror = () => {
+        stage.innerHTML = `
+          <img class="auto-body" src="${spriteUrl(bId)}" alt="${bName}" />
+          <img class="auto-head" src="${spriteUrl(hId)}" alt="${hName}" />
+        `;
+        badge.textContent = 'Auto-Preview (Needs Custom Art)';
+        badge.className = 'badge auto';
+        credit.textContent = 'Artist: None yet — submit yours on Discord!';
+      };
+      testImg.src = customPath;
+    }
+
+    headSelect.addEventListener('change', renderFusion);
+    bodySelect.addEventListener('change', renderFusion);
+    document.getElementById('randomBtn').addEventListener('click', () => {
+      headSelect.value = Math.floor(Math.random() * 1025) + 1;
+      bodySelect.value = Math.floor(Math.random() * 1025) + 1;
+      renderFusion();
+    });
+
+    init();
+  </script>
+</body>
+</html>
