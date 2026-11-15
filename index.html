@@ -63,8 +63,8 @@
     let pokemonList = [];
     let creditsMap = {};
 
-    const spriteUrl = (id) => `https://jsdelivr.net{id}.png`;
-    const cap = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+    const spriteUrl = (id) => `https://githubusercontent.com{id}.png`;
+    const cap = (str) => str ? str.charAt(0).toUpperCase() + str.slice(1) : '';
 
     async function init() {
       pokemonList = Array.from({ length: 1025 }, (_, i) => ({ id: i + 1, name: `Pokémon #${i + 1}` }));
@@ -76,7 +76,7 @@
       } catch (e) {}
 
       try {
-        const csvRes = await fetch('https://jsdelivr.net');
+        const csvRes = await fetch('https://githubusercontent.com');
         if (csvRes.ok) {
           const text = await csvRes.text();
           const lines = text.trim().split('\n').slice(1);
