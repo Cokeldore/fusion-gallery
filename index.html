@@ -63,8 +63,7 @@
     const pokemonMap = new Map();
     let creditsMap = {};
 
-    const spriteUrl = (id) => `https://githubusercontent.com{id}.png`;
-    const cap = (str) => str ? str.charAt(0).toUpperCase() + str.slice(1) : '';
+    const spriteUrl = (id) => `https://jsdelivr.net{id}.png`;
 
     async function init() {
       for (let i = 1; i <= 1025; i++) {
@@ -78,11 +77,11 @@
       } catch (e) {}
 
       try {
-        const res = await fetch('https://pokeapi.co');
+        const res = await fetch('https://jsdelivr.net');
         if (res.ok) {
-          const data = await res.json();
-          data.results.forEach((item, index) => {
-            pokemonMap.set(index + 1, cap(item.name));
+          const names = await res.json();
+          names.forEach((name, index) => {
+            if (index < 1025) pokemonMap.set(index + 1, name);
           });
           populateDropdowns();
         }
